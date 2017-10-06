@@ -4,7 +4,9 @@
       <v-layout justify-center>
         <nav-menu @close-menu="toggleMenu()" />
         <v-btn @click.stop="toggleNav();" class="pink white--text">Toggle</v-btn>
+        <h1>{{ isLoggedIn }}</h1>
         <router-view />
+
       </v-layout>
     </v-container>
     <v-navigation-drawer
@@ -34,12 +36,25 @@ import './polyfills/string-startsWith';
 
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import AuthService from './services/Auth';
+import { mapActions, mapGetters } from 'vuex';
+// import AuthService from './services/Auth';
+import store from './store';
 
-@Component
+@Component({
+  computed: mapGetters({
+    isLoggedIn: 'authState'
+  }),
+})
 export default class App extends Vue {
   sideNavOpen: boolean = false;
   mini: boolean = false;
+
+  // isLoggedIn: boolean = false;
+
+  beforeCreate() {
+    this.$store.dispatch('setSignIn');
+  }
+
   toggleMenu() {
     // alert('hi');
     this.sideNavOpen = !this.sideNavOpen;

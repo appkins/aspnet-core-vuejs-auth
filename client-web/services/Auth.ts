@@ -1,5 +1,5 @@
 import RestUtilities from './RestUtilities';
-import AuthStore from '../stores/Auth';
+// import AuthStore from '../store/Auth';
 
 interface IAuthResponse {
     access_token: string;
@@ -7,16 +7,17 @@ interface IAuthResponse {
 
 export default class Auth {
     static isSignedInIn(): boolean {
-        return !!AuthStore.getToken();
+        // return !!AuthStore.getToken();
+        return true;
     }
 
     signInOrRegister(email: string, password: string, isRegister: boolean = false) {
         return RestUtilities.post<IAuthResponse>(`/api/auth/${isRegister ? 'register' : 'login'}`,
             `username=${email}&password=${password}${!isRegister ? '&grant_type=password' : ''}`)
             .then((response) => {
-                if (!response.is_error) {
-                    AuthStore.setToken(response.content.access_token);
-                }
+                // if (!response.is_error) {
+                //     AuthStore.setToken(response.content.access_token);
+                // }
                 return response;
             });
     }
@@ -40,6 +41,6 @@ export default class Auth {
     }
 
     signOut(): void {
-        AuthStore.removeToken();
+        // AuthStore.removeToken();
     }
 }

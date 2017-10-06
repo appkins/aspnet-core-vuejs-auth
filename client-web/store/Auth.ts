@@ -12,4 +12,6 @@ export default class Auth {
     static removeToken(): void {
         window.localStorage.removeItem(Auth.STORAGE_KEY);
     }
+
+
 }

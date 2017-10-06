@@ -1,4 +1,4 @@
-import AuthStore from '../stores/Auth';
+import AuthStore from '../store/Auth';
 
 export interface IErrorContent {
     error: string;

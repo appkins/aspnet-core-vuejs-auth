@@ -48,14 +48,22 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import AuthService from '../services/Auth';
+// import AuthService from '../services/Auth';
 
-@Component
+import { mapActions, mapGetters } from 'vuex';
+import store from '../store';
+
+@Component({
+  computed: mapGetters({
+    isLoggedIn: 'authState',
+    error: 'getError'
+  })
+})
 export default class SignIn extends Vue {
   username: string = "user@test.com";
   password: string = "P2ssw0rd!";
   valid: boolean = true;
-  error: string = null;
+  // error: string = null;
 
   hidePassword: boolean = true;
 
@@ -82,15 +90,21 @@ export default class SignIn extends Vue {
   }
 
   onSubmit() {
-    let authService = new AuthService();
-    authService.signIn(this.username, this.password).then(response => {
-      if (!response.is_error) {
-        this.$router.push({ path: '/contacts' });
-      } else {
-        this.error = response.error_content.error_description;
-      }
-    });
+    this.$store.dispatch('signIn', {username: this.username, password: this.password});
+    this.$router.push({ path: '/contacts' });
   }
+
+  //   onSubmit() {
+  //   let authService = new AuthService();
+  //   authService.signIn(this.username, this.password).then(response => {
+  //     if (!response.is_error) {
+  //       this.$router.push({ path: '/contacts' });
+  //     } else {
+  //       this.error = response.error_content.error_description;
+  //     }
+  //   });
+  // }
+
 
 }
 </script>

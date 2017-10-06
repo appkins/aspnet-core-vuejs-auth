@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Vuex from 'vuex';
 
 import App from './App.vue'
 import AuthLayout from './layouts/Auth.vue';
@@ -12,14 +11,18 @@ import ContactForm from './components/ContactForm.vue';
 import Vuetify from 'vuetify';
 import NavMenu from './layouts/nav-menu/nav-menu.vue';
 import SideNav from './layouts/side-nav/side-nav.vue';
+// import router from './router';
+import store from './store';
+
+import routes from './router';
+
 Vue.use(VueRouter);
-Vue.use(Vuex);
 Vue.use(Vuetify);
+
 Vue.component('nav-menu', NavMenu);
 Vue.component('side-nav', SideNav);
 
 let router = new VueRouter({
-    mode: 'history',
     routes: [
         {
             path: '', component: AuthLayout,
@@ -36,11 +39,13 @@ let router = new VueRouter({
                 { path: '/contacts/edit/:id', name: 'editContact', component: ContactForm }
             ]
         },
-    ]
+    ],
+    mode: 'history',
 });
 
 new Vue({
     el: '#app',
     router: router,
+    store,
     render: h => h(App, {})
 });
