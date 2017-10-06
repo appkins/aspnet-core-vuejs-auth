@@ -11,6 +11,7 @@ import ContactForm from './components/ContactForm.vue';
 import Vuetify from 'vuetify';
 import NavMenu from './layouts/nav-menu/nav-menu.vue';
 import SideNav from './layouts/side-nav/side-nav.vue';
+import Home from './pages/Home.vue';
 // import router from './router';
 import store from './store';
 
@@ -22,19 +23,42 @@ Vue.use(Vuetify);
 Vue.component('nav-menu', NavMenu);
 Vue.component('side-nav', SideNav);
 
+async function redirectIfNotAuth (to: any, from: any, next: any) {
+    store.dispatch('initApp');
+    const user = await getUserState()
+    if (user === false) {
+      next({ name: 'SignIn' })
+    } else {
+      next()
+    }
+  }
+
+  function getUserState () {
+    return new Promise((resolve, reject) => {
+      if (store.state.isSignedIn === undefined) {
+        const unwatch = store.watch(
+          () => store.state.isSignedIn,
+          (value) => {
+            unwatch()
+            resolve(value)
+          }
+        )
+      } else {
+        resolve(store.state.isSignedIn)
+      }
+    })
+  }
+
+
 let router = new VueRouter({
     routes: [
         {
             path: '', component: AuthLayout,
             children: [
-                { path: '/', component: SignIn },
+                { path: '/', component: Home },
+                { name: 'SignIn', path: '/signin', component: SignIn },
                 { path: '/register', component: Register },
-            ]
-        },
-        {
-            path: '', component: DefaultLayout,
-            children: [
-                { path: '/contacts', component: Contacts },
+                { path: '/contacts', component: Contacts, beforeEnter: redirectIfNotAuth },
                 { path: '/contacts/new', component: ContactForm },
                 { path: '/contacts/edit/:id', name: 'editContact', component: ContactForm }
             ]
@@ -43,7 +67,9 @@ let router = new VueRouter({
     mode: 'history',
 });
 
-new Vue({
+
+
+const app = new Vue({
     el: '#app',
     router: router,
     store,

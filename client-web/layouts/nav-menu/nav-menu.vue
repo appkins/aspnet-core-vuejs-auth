@@ -6,8 +6,8 @@
           <v-btn icon @click="goTo('/');">
                       <v-icon>home</v-icon>
               </v-btn>
-          <v-btn outline @click="signOut();">
-                  <v-icon>search</v-icon> {{ signedIn ? 'Sign In' : 'Sign Out' }}
+          <v-btn outline @click="account(isLoggedIn);">
+                  <v-icon>search</v-icon> {{ isLoggedIn ? 'Sign Out' : 'Sign In' }}
           </v-btn>
         </v-toolbar>
 </template>
@@ -15,15 +15,28 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import AuthService from '../../services/Auth';
+  //import store from '../../store';
+  import { mapActions, mapGetters } from 'vuex';
 
-  @Component
+  @Component({
+  computed: mapGetters({
+    isLoggedIn: 'authState'
+  })
+})
   export default class NavMenu extends Vue {
-    signedIn: boolean = false;
+    // signedIn: boolean = false;
+
+    account(signedIn: boolean) {
+      if (signedIn) {
+        this.signOut();
+      }
+      else {
+        this.$router.push({ path: '/signin' });
+      }
+    }
 
     signOut() {
-      let authService = new AuthService();
-      authService.signOut();
+      this.$store.dispatch('signOut');
       this.$router.push({ path: '/?signedOut=1' });
     }
 

@@ -6,9 +6,9 @@
       </v-list-tile-action>
     </v-list-tile>
     <v-divider light></v-divider>
-    <v-list-tile v-for="item in items" :key="item.title" @click="toggleNav();">
-      <v-list-tile-action @click="goTo(item.page);">
-        <v-icon>{{ item.icon }}</v-icon> {{ item.title }}
+    <v-list-tile v-for="item in items" :key="item.title" @click="toggleNav();goTo(item.page);">
+      <v-list-tile-action>
+        <v-icon>{{ item.icon }}</v-icon>
       </v-list-tile-action>
       <v-list-tile-content>
         <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -26,7 +26,7 @@ export default class SideNav extends Vue {
         open: boolean;
         items: any = [
           { title: 'Home', icon: 'dashboard', page: '/' },
-          { title: 'About', icon: 'question_answer', page: '/Contact' }
+          { title: 'Contacts', icon: 'question_answer', page: '/contacts' }
         ];
         mini: boolean;
         right: boolean;

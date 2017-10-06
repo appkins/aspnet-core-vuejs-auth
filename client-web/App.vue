@@ -3,8 +3,6 @@
     <v-container>
       <v-layout justify-center>
         <nav-menu @close-menu="toggleMenu()" />
-        <v-btn @click.stop="toggleNav();" class="pink white--text">Toggle</v-btn>
-        <h1>{{ isLoggedIn }}</h1>
         <router-view />
 
       </v-layout>
@@ -52,7 +50,7 @@ export default class App extends Vue {
   // isLoggedIn: boolean = false;
 
   beforeCreate() {
-    this.$store.dispatch('setSignIn');
+    // this.$store.dispatch('setSignIn');
   }
 
   toggleMenu() {

@@ -36,9 +36,14 @@ const store = new Vuex.Store({
         state.isSignedIn = !state.isSignedIn;
       },
       setSignIn(state){
-          const key = window.localStorage.getItem(STORAGE_KEY);
+          // const key = window.localStorage.getItem(STORAGE_KEY);
           // alert(key);
-          state.isSignedIn = key !== null;
+          // state.isSignedIn = key !== null;
+          state.isSignedIn = this.getters.getToken !== null;
+      },
+      signOut(state) {
+        window.localStorage.removeItem(STORAGE_KEY);
+        state.isSignedIn = false;
       },
       setToken(state, token){
         window.localStorage.setItem(STORAGE_KEY, token);
@@ -49,6 +54,13 @@ const store = new Vuex.Store({
       },
     },
     actions: {
+        initApp ({ commit }) {
+            //const key = window.localStorage.getItem(STORAGE_KEY);
+            // alert(key);
+            commit('setSignIn');
+            //alert(key);
+            //return (key !== null);
+        },
         toggleSignIn({ commit }) {
             commit('toggleSignIn')
           },
@@ -59,7 +71,7 @@ const store = new Vuex.Store({
             let authService = new AuthService();
             authService.signInOrRegister(email, password, isRegister).then(response => {
               if (!response.is_error) {
-                commit('toggleSignIn');
+                // commit('toggleSignIn');
                 commit('setToken', response.content.access_token);
                 // this.$router.push({ path: '/contacts' });
               } else {
@@ -80,7 +92,6 @@ const store = new Vuex.Store({
         },
         signOut ({ commit, state }) {
             return new Promise((resolve, reject) => {
-                window.localStorage.removeItem(STORAGE_KEY);
                 commit('signOut');
                 resolve();
             })

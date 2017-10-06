@@ -55,11 +55,12 @@ import store from '../store';
 
 @Component({
   computed: mapGetters({
-    isLoggedIn: 'authState',
+    // isLoggedIn: 'authState',
     error: 'getError'
   })
 })
 export default class SignIn extends Vue {
+  // isLoggedIn: boolean = false;
   username: string = "user@test.com";
   password: string = "P2ssw0rd!";
   valid: boolean = true;
@@ -92,6 +93,10 @@ export default class SignIn extends Vue {
   onSubmit() {
     this.$store.dispatch('signIn', {username: this.username, password: this.password});
     this.$router.push({ path: '/contacts' });
+  }
+
+  beforeMount(){
+
   }
 
   //   onSubmit() {

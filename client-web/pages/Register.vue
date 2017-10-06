@@ -1,23 +1,47 @@
 <template>
   <div>
-    <form v-if="!registerComplete" class="formAuth" v-on:submit.prevent="onSubmit">
-      <h2 class="formAuthHeading">Please register for access</h2>
-      <div v-if="errors.general" class="alert alert-danger" role="alert">
-        {{firstError(errors.general)}}
-      </div>
-      <div v-bind:class="{ 'has-danger': errors.username }" class="form-group">
-        <label htmlFor="inputEmail">Email address</label>
-        <input type="email" id="inputEmail" v-model="email" class="form-control" placeholder="Email address" />
-        <div class="form-control-feedback">{{ firstError(errors.username)}}</div>
-      </div>
-      <div v-bind:class="{ 'has-danger': errors.password }" class="form-group">
-        <label htmlFor="inputPassword">Password</label>
-        <input type="password" id="inputPassword" v-model="password" class="form-control" placeholder="Password" />
-        <div class="form-control-feedback">{{ firstError(errors.password)}}</div>
-      </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
-    </form>
-    <register-complete v-else v-bind:email="email" />
+
+  <h2 class="formAuthHeading">Please register for access</h2>
+  <div v-if="isConfirmed" class="alert alert-success" role="alert">
+  Your email address has been successfully confirmed.
+  </div>
+  <div v-if="isExpired" class="alert alert-info" role="alert">
+  <strong>Sesion Expired</strong> You need to sign in again.
+  </div>
+  <div v-if="isSignedOut" class="alert alert-info" role="alert">
+  <strong>Signed Out</strong>
+  </div>
+  <div v-if="error" class="alert alert-danger" role="alert">
+  {{error}}
+  </div>
+  <v-form v-model="valid" ref="form" lazy-validation>
+      <v-text-field
+        label="Email"
+        v-model="email"
+        :rules="emailRules"
+        required
+      ></v-text-field>
+      <v-text-field
+        label="Password"
+        v-model="password"
+        :rules="passwordRules"
+        :append-icon="hidePassword ? 'visibility' : 'visibility_off'"
+        :append-icon-cb="() => (hidePassword = !hidePassword)"
+        required
+        :type="hidePassword ? 'password' : 'text'"
+      ></v-text-field>
+
+      <v-btn
+        @click="onSubmit();"
+        :disabled="!valid"
+      >
+        submit
+      </v-btn>
+    </v-form>
+
+    <div class="authEtc">
+      <router-link to="/signin">Sign In</router-link>
+    </div>
   </div>
 </template>
 
@@ -25,24 +49,42 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import RegisterComplete from '../components/RegisterComplete.vue';
-import AuthService from '../services/Auth';
+import { mapGetters } from 'vuex';
+// import AuthService from '../services/Auth';
 
-@Component({components: { RegisterComplete } })
+@Component(
+  {
+  components: { RegisterComplete },
+  computed: mapGetters({
+      // isLoggedIn: 'authState',
+      error: 'getError'
+    })
+  })
 export default class Register extends Vue {
-  email: string = "";
-  password: string = "";
+  email: string = "user@test.com";
+  password: string = "P2ssw0rd!";
+  valid: boolean = true;
   registerComplete = false;
   errors: { [key: string]: string } = {};
 
+  hidePassword: boolean = true;
+  emailRules: Array<any> = [
+    (v: any) => !!v || 'E-mail is required',
+    (v: any) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+  ];
+
+  passwordRules: Array<any> = [
+    (v: any) => !!v || 'Password is required',
+    (v: any) => v.length >= 6 || 'Password must be at least 6 characters long'
+  ];
+
   onSubmit() {
-    let authService = new AuthService();
-    authService.register(this.email, this.password).then(response => {
-      if (!response.is_error) {
-        this.registerComplete = true;
-      } else {
-        this.errors = response.error_content;
-      }
+    this.$store.dispatch('signIn', {username: this.email, password: this.password}).then(result => {
+      //this.$router.push({ path: '/contacts' });
+    }).catch(error => {
+      alert(error);
     });
+    // this.$router.push({ path: '/contacts' });
   }
 
   firstError(errors:string[]){
