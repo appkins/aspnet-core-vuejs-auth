@@ -44,7 +44,7 @@ namespace aspnetCoreReactTemplate
             });
 
             // Configure Entity Framework Initializer for seeding
-            services.AddTransient<IDefaultDbContextInitializer, DefaultDbContextInitializer>();
+            //services.AddTransient<IDefaultDbContextInitializer, DefaultDbContextInitializer>();
 
             // Configure Entity Framework Identity for Auth
             services.AddIdentity<ApplicationUser, IdentityRole>(o =>
@@ -115,7 +115,7 @@ namespace aspnetCoreReactTemplate
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IDefaultDbContextInitializer databaseInitializer)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // Log to console (stdout) - in production stdout will be written to /var/log/{{app_name}}.out.log
             loggerFactory.AddConsole(Configuration.GetSection("logging"));
@@ -123,11 +123,11 @@ namespace aspnetCoreReactTemplate
 
             // Apply any pending migrations
             // Do not call EnsureCreated() b/c it does not log to _EFMigrationsHistory table (Ref: https://github.com/aspnet/EntityFramework/issues/3875)
-            databaseInitializer.Migrate();
+            //databaseInitializer.Migrate();
 
             if (env.IsDevelopment())
             {
-                databaseInitializer.Seed().GetAwaiter().GetResult();
+                //databaseInitializer.Seed().GetAwaiter().GetResult();
 
                 // Configure Webpack Middleware (Ref: http://blog.stevensanderson.com/2016/05/02/angular2-react-knockout-apps-on-aspnet-core/)
                 //  - Intercepts requests for webpack bundles and routes them through Webpack - this prevents needing to run Webpack file watcher separately

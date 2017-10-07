@@ -68,26 +68,66 @@ const store = new Vuex.Store({
             commit('setSignIn')
         },
         async signInOrRegister({ commit, state }, {email, password, isRegister}) {
-            let authService = new AuthService();
-            authService.signInOrRegister(email, password, isRegister).then(response => {
-              if (!response.is_error) {
-                // commit('toggleSignIn');
-                commit('setToken', response.content.access_token);
-                // this.$router.push({ path: '/contacts' });
-              } else {
-                commit('setError', response.error_content.error_description);
-              }
-            });
+                let authService = new AuthService();
+                return await authService.signInOrRegister(email, password, isRegister)
+                .then(
+                    response => {
+                        if (!response.is_error) {
+                            // commit('toggleSignIn');
+                            commit('setToken', response.content.access_token);
+                            return response;
+                            // this.$router.push({ path: '/contacts' });
+                        }
+                        else {
+                            //alert(response);
+                            if (response.error_content){
+                                if(response.error_content.error_description) {
+                                    commit('setError', response.error_content.error_description);
+                                }
+                                else {
+                                    commit('setError', JSON.stringify(response.error_content).toString().replace(/[|&;{|&;}|&;"|&;(|&;)|&;,]/g, ""));
+                                }
+                            }
+                            return response;
+                        }
+                })
+                .catch(error => {
+                    commit('setError', error);
+                    //alert(error);
+                    return error;
+                });
         },
         async signIn ({ dispatch, commit }, {username, password}) {
-                let isRegister = false;
+
                 // alert(username + password);
-                await dispatch('signInOrRegister', {email: username, password: password, isRegister});
+                let isRegister = false;
+                return await dispatch('signInOrRegister', {email: username, password: password, isRegister})
+                .then(result => {
+                    if (!result.is_error) {
+                        // alert(JSON.stringify(result));
+                        return result;
+                    }
+                })
+                .catch(error => {
+                    commit('setError', error);
+                    return error});
+
                 // this.actions.signInOrRegister({ commit, state}, {email, password, isRegister});
         },
         async register ({ dispatch, commit }, {username, password}) {
             let isRegister = true;
-            await dispatch('signInOrRegister', {email: username, password: password, isRegister});
+            return await dispatch('signInOrRegister', {email: username, password: password, isRegister})
+            .then(result => {
+                if (!result.is_error) {
+                    //alert(result.general);
+
+                    return result;
+                }
+                return result;
+            })
+            .catch(error => {
+                commit('setError', error);
+                return error});
             // this.actions.signInOrRegister({ commit, state}, {email, password, isRegister});
         },
         signOut ({ commit, state }) {

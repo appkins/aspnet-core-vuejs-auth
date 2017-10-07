@@ -1,19 +1,23 @@
 <template>
-  <div>
+  <div class="auth-form">
 
   <h2 class="formAuthHeading">Please register for access</h2>
   <div v-if="isConfirmed" class="alert alert-success" role="alert">
   Your email address has been successfully confirmed.
   </div>
-  <div v-if="isExpired" class="alert alert-info" role="alert">
+  <v-alert v-if="isConfirmed" color="info" icon="warning" value="true">
+  Your email address has been successfully confirmed.
+  </v-alert>
+  <v-alert v-if="isExpired" color="info" icon="warning" value="true">
   <strong>Sesion Expired</strong> You need to sign in again.
-  </div>
-  <div v-if="isSignedOut" class="alert alert-info" role="alert">
+  </v-alert>
+  <v-alert v-if="isSignedOut" color="info" icon="warning" value="true">
   <strong>Signed Out</strong>
-  </div>
-  <div v-if="error" class="alert alert-danger" role="alert">
-  {{error}}
-  </div>
+  </v-alert>
+
+  <v-alert v-if="error" color="error" icon="warning" value="true">
+    {{error}}
+  </v-alert>
   <v-form v-model="valid" ref="form" lazy-validation>
       <v-text-field
         label="Email"
@@ -78,11 +82,28 @@ export default class Register extends Vue {
     (v: any) => v.length >= 6 || 'Password must be at least 6 characters long'
   ];
 
-  onSubmit() {
-    this.$store.dispatch('signIn', {username: this.email, password: this.password}).then(result => {
-      //this.$router.push({ path: '/contacts' });
-    }).catch(error => {
-      alert(error);
+  get isConfirmed() {
+    return this.$route.query.confirmed;
+  }
+
+  get isExpired() {
+    return this.$route.query.expired;
+  }
+
+  get isSignedOut() {
+    return this.$route.query.signedOut;
+  }
+
+  async onSubmit() {
+    await this.$store.dispatch('register', {username: this.email, password: this.password})
+    .then(response => {
+      // alert(JSON.stringify(response));
+        if (!response.is_error) {
+          this.$router.push({ path: '/contacts' });
+        }
+    })
+    .catch(error => {
+
     });
     // this.$router.push({ path: '/contacts' });
   }
@@ -95,4 +116,7 @@ export default class Register extends Vue {
 </script>
 
 <style scoped lang="stylus">
+.auth {
+  max-width: 25em;
+}
 </style>

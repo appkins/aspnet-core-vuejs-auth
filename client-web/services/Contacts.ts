@@ -17,8 +17,8 @@ export default class Contacts {
         return RestUtilities.get<IContact>(`/api/contacts/${contactId}`);
     }
 
-    search(query: string) {
-        return RestUtilities.get<Array<IContact>>(`/api/contacts/search/?q=${query}`);
+    search(query: string, pageSize: number, pageNumber: number, orderRow: string, isAscending: boolean) {
+        return RestUtilities.get<{ contact: Array<IContact>, total: number}>(`/api/contacts/search/?q=${query}&pageSize=${pageSize}&pageNumber=${pageNumber}&orderRow=${orderRow}&isAscending=${isAscending}`);
     }
 
     update(contact: IContact) {

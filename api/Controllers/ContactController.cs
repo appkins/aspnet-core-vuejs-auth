@@ -8,8 +8,8 @@ using System.Linq;
 
 namespace aspnetCoreReactTemplate.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
+    // [Authorize]
+    [Route("api/Contacts")]
     public class ContactsController : Controller
     {
         DefaultDbContext _context;
@@ -23,7 +23,7 @@ namespace aspnetCoreReactTemplate.Controllers
         [HttpGet]
         public IEnumerable<Contact> Get()
         {
-            return _context.Contacts.OrderBy((o)=> o.lastName);
+            return _context.Contacts.OrderBy((o)=> o.lastName).Take(12);
         }
 
         // GET api/contacts/5
@@ -35,11 +35,65 @@ namespace aspnetCoreReactTemplate.Controllers
 
         // GET api/contacts/?=
         [HttpGet("search")]
-        public IEnumerable<Contact> Search(string q)
+        public JsonResult Search(string q, int? pageSize, int? pageNumber, string orderRow, bool isAscending )
         {
-            return _context.Contacts.
-            Where((c)=> c.lastName.Contains(q) || c.firstName.Contains(q)).
-            OrderBy((o) => o.lastName);
+            var query = _context.Contacts.AsQueryable();
+            var OrderRow = orderRow ?? "";
+            var Q = q ?? "";
+            if (Q.Length > 0){
+              query.Where((c)=> c.lastName.Contains(Q) || c.firstName.Contains(Q));
+            };
+
+            var total = query.Count();
+
+            query = FilterTable(query, OrderRow, isAscending);
+
+            int page = (pageNumber ?? 1) > 0 ? (pageNumber ?? 1) : 1;
+            //page = page > 0 ? page : 1;
+            int PageSize = pageSize ?? 12;
+
+            return Json(new
+            {
+              contacts = query.Skip((page - 1) * (PageSize)).Take(PageSize),
+              total = total
+            });
+
+            // return query.Take(pageSize ?? 12)
+            // .Skip(PageNumber - 1);
+        }
+
+        public IQueryable<Contact> FilterTable(IQueryable<Contact> query, string OrderRow, bool isAscending) {
+          switch (OrderRow) {
+              case "firstName":
+                if (isAscending)
+                  return query.OrderBy((o) => o.firstName);
+                else
+                  return query.OrderByDescending((o) => o.firstName);
+              case "lastName":
+                if (isAscending)
+                  return query.OrderBy((o) => o.lastName);
+                else
+                  return query.OrderByDescending((o) => o.lastName);
+              case "phone":
+                if (isAscending)
+                  return query.OrderBy((o) => o.phone);
+                else
+                  return query.OrderByDescending((o) => o.phone);
+              case "email":
+                if (isAscending) {
+                  return query.OrderBy((o) => o.email);
+                }
+                else {
+                  return query.OrderByDescending((o) => o.email);
+                }
+              default:
+              {
+                if (isAscending)
+                  return query.OrderBy((o) => o.contactId);
+                else
+                  return query.OrderByDescending((o) => o.contactId);
+              }
+            };
         }
 
         // POST api/contacts
